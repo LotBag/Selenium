@@ -1,65 +1,55 @@
-package loginPage;
+package loginPage.loginPageTests;
 
-import org.apache.commons.io.FileUtils;
+import loginPage.POM.LoginPagePOM;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.By;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.time.Duration;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
+
+import static loginPage.UtilsForLoginPageTest.Utils.*;
 
 public class LoginPageTest {
 
     private String[] testResult = new String[5];
+    private static Properties properties;
 
-    private final String correctPassword = "TestPassword";
-    private final String correctLogin = "QA2";
+    private static String correctPassword;
+    private static String correctLogin;
+    private static String seleniumHubUrl;
+    private static String loginPageUrl;
+    private static String testUserDashBoardUrl;
+
     private WebDriver driver;
     private WebDriverWait wait;
     private final By wrongDataMessage = By.xpath("/html/body/div[2]/div[1]/div/div[1]/div[2]/div[1]");
-
-    private static WebDriver setUpRemoteWebDriver() throws MalformedURLException {
-        URL hubURl = new URL("http://localhost:4444/");
-
-        DesiredCapabilities caps = new DesiredCapabilities();
-        caps.setBrowserName("chrome");
-
-        return new RemoteWebDriver(hubURl, caps);
-    }
-
-    private void takeScreenShot(String fileName) {
-        TakesScreenshot takesScreenshot = (TakesScreenshot) driver;
-        File srcFile = takesScreenshot.getScreenshotAs(OutputType.FILE);
-
-        try {
-            FileUtils.copyFile(srcFile, new File("C:\\Users\\LotBag\\Desktop\\Hexlet\\Selenium\\src" +
-                    "\\test\\resources" + fileName + ".png"));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     public String[] getTestResult() {
         return testResult;
     }
 
+    @BeforeAll
+    public static void beforeAll() throws IOException {
+        properties = loadProperties();
+        correctPassword = properties.getProperty("correctPassword");
+        correctLogin = properties.getProperty("correctLogin");
+        seleniumHubUrl = properties.getProperty("seleniumHubUrl");
+        loginPageUrl = properties.getProperty("loginPageUrl");
+        testUserDashBoardUrl = properties.getProperty("testUserDashBoardUrl");
+    }
+
     @BeforeEach
     public void setUp() throws MalformedURLException {
-        driver = setUpRemoteWebDriver();
+        driver = setUpRemoteWebDriver(seleniumHubUrl, "chrome");
         wait = new WebDriverWait(driver, Duration.ofSeconds(20));
         driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
-        driver.get("http://193.233.193.42:9091/");
+        driver.get(loginPageUrl);
    }
    
     @DisplayName("Test with correct login and password")
@@ -69,16 +59,16 @@ public class LoginPageTest {
         LoginPagePOM loginPage = new LoginPagePOM(driver);
         loginPage.login(correctLogin, correctPassword);
 
-        wait.until(ExpectedConditions.urlToBe("http://193.233.193.42:9091/dashboard?id=158-39"));
+        wait.until(ExpectedConditions.urlToBe(testUserDashBoardUrl));
 
-        Assertions.assertEquals(driver.getCurrentUrl(), "http://193.233.193.42:9091/dashboard?id=158-39");
+        Assertions.assertEquals(driver.getCurrentUrl(), testUserDashBoardUrl);
 
-        if (driver.getCurrentUrl().equals("http://193.233.193.42:9091/dashboard?id=158-39")) {
+        if (driver.getCurrentUrl().equals(testUserDashBoardUrl)) {
             testResult[0] = "Test " + testName + " passed";
-            takeScreenShot(testName);
+            takeScreenShot(testName, driver);
         } else  {
             testResult[0] = "Test " + testName + " failed";
-            takeScreenShot(testName);
+            takeScreenShot(testName, driver);
         }
 
 
@@ -92,19 +82,19 @@ public class LoginPageTest {
         loginPage.setCheckBox();
         loginPage.login(correctLogin, correctPassword);
 
-        wait.until(ExpectedConditions.urlToBe("http://193.233.193.42:9091/dashboard?id=158-39"));
+        wait.until(ExpectedConditions.urlToBe(testUserDashBoardUrl));
 
-        driver.get("http://193.233.193.42:9091");
+        driver.get(loginPageUrl);
 
-        wait.until(ExpectedConditions.urlToBe("http://193.233.193.42:9091/dashboard?id=158-39"));
+        wait.until(ExpectedConditions.urlToBe(testUserDashBoardUrl));
 
-        Assertions.assertEquals(driver.getCurrentUrl(), "http://193.233.193.42:9091/dashboard?id=158-39");
+        Assertions.assertEquals(driver.getCurrentUrl(), testUserDashBoardUrl);
 
-        if (driver.getCurrentUrl().equals("http://193.233.193.42:9091/dashboard?id=158-39")) {
+        if (driver.getCurrentUrl().equals(testUserDashBoardUrl)) {
             testResult[0] = "Test " + testName + " passed";
         } else  {
             testResult[0] = "Test " + testName + " failed";
-            takeScreenShot(testName);
+            takeScreenShot(testName, driver);
         }
     }
 
@@ -125,7 +115,7 @@ public class LoginPageTest {
             testResult[0] = "Test " + testName + " passed";
         } else  {
             testResult[0] = "Test " + testName + " failed";
-            takeScreenShot(testName);
+            takeScreenShot(testName, driver);
         }
     }
 
@@ -146,7 +136,7 @@ public class LoginPageTest {
             testResult[0] = "Test " + testName + " passed";
         } else  {
             testResult[0] = "Test " + testName + " failed";
-            takeScreenShot(testName);
+            takeScreenShot(testName, driver);
         }
     }
 
@@ -173,7 +163,7 @@ public class LoginPageTest {
             testResult[0] = "Test " + testName + " passed";
         } else  {
             testResult[0] = "Test " + testName + " failed";
-            takeScreenShot(testName);
+            takeScreenShot(testName, driver);
         }
     }
 

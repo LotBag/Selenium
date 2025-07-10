@@ -1,4 +1,4 @@
-package loginPage;
+package loginPage.POM;
 
 
 import org.openqa.selenium.By;
@@ -7,11 +7,13 @@ import org.openqa.selenium.WebDriver;
 public class LoginPagePOM {
     private WebDriver driver;
 
-    private final By userNameField = By.id("username");
-    private final By passwordField = By.id("password");
-    private final By checkBox = By.id("rg-checkbox-0");
-    private final By loginButton = By.xpath("/html/body/div[2]/div[1]/div/div[2]/form/div[2]/div[2]/button");
-    private final By forgotPasswordLink = By.linkText("Сбросить пароль");
+    private final By userNameField = By.xpath("//*[@id='username']");
+    private final By passwordField = By.xpath("//*[@id='password']");
+    private final By checkBox = By.xpath("//*[@id='rg-checkbox-0']");
+    private final By loginButton = By.xpath("//div[@class='form-row']//button[contains(@class, " +
+            "'auth-button')]");
+    private final By forgotPasswordLink = By.xpath("//div[not(contains(@class, " +
+            "'login-page__padded-panel'))]/flexible-link/a/span[text()='Сбросить пароль'][1]");
 
 
     public LoginPagePOM(WebDriver driver) {
