@@ -16,8 +16,6 @@ import java.util.concurrent.TimeUnit;
 import static loginPage.UtilsForLoginPageTest.Utils.*;
 
 public class LoginPageTest {
-
-    private String[] testResult = new String[5];
     private static Properties properties;
 
     private static String correctPassword;
@@ -25,14 +23,13 @@ public class LoginPageTest {
     private static String seleniumHubUrl;
     private static String loginPageUrl;
     private static String testUserDashBoardUrl;
+    private static String wrongLoginOrPasswordMessage;
+    private static String correctEmailRequired;
 
     private WebDriver driver;
     private WebDriverWait wait;
-    private final By wrongDataMessage = By.xpath("/html/body/div[2]/div[1]/div/div[1]/div[2]/div[1]");
-
-    public String[] getTestResult() {
-        return testResult;
-    }
+    private final By wrongDataMessage = By.xpath("//*[text()=" +
+            "'Некорректное имя пользователя или пароль.']");
 
     @BeforeAll
     public static void beforeAll() throws IOException {
@@ -42,6 +39,8 @@ public class LoginPageTest {
         seleniumHubUrl = properties.getProperty("seleniumHubUrl");
         loginPageUrl = properties.getProperty("loginPageUrl");
         testUserDashBoardUrl = properties.getProperty("testUserDashBoardUrl");
+        wrongLoginOrPasswordMessage = properties.getProperty("wrongLoginOrPasswordMessage");
+        correctEmailRequired = properties.getProperty("correctEmailRequired");
     }
 
     @BeforeEach
@@ -64,10 +63,8 @@ public class LoginPageTest {
         Assertions.assertEquals(driver.getCurrentUrl(), testUserDashBoardUrl);
 
         if (driver.getCurrentUrl().equals(testUserDashBoardUrl)) {
-            testResult[0] = "Test " + testName + " passed";
             takeScreenShot(testName, driver);
         } else  {
-            testResult[0] = "Test " + testName + " failed";
             takeScreenShot(testName, driver);
         }
 
@@ -91,9 +88,7 @@ public class LoginPageTest {
         Assertions.assertEquals(driver.getCurrentUrl(), testUserDashBoardUrl);
 
         if (driver.getCurrentUrl().equals(testUserDashBoardUrl)) {
-            testResult[0] = "Test " + testName + " passed";
         } else  {
-            testResult[0] = "Test " + testName + " failed";
             takeScreenShot(testName, driver);
         }
     }
@@ -106,15 +101,12 @@ public class LoginPageTest {
         String wrongPassword = "wrongPassword";
         loginPage.login(correctLogin, wrongPassword);
 
-        wait.until(ExpectedConditions.textToBe(wrongDataMessage, "Некорректное имя пользователя или пароль."));
+        wait.until(ExpectedConditions.textToBe(wrongDataMessage, wrongLoginOrPasswordMessage));
 
-        Assertions.assertEquals("Некорректное имя пользователя или пароль.",
-                driver.findElement(wrongDataMessage).getText());
+        Assertions.assertEquals(wrongLoginOrPasswordMessage, driver.findElement(wrongDataMessage).getText());
 
-        if ("Некорректное имя пользователя или пароль.".equals(driver.findElement(wrongDataMessage).getText())) {
-            testResult[0] = "Test " + testName + " passed";
+        if (wrongLoginOrPasswordMessage.equals(driver.findElement(wrongDataMessage).getText())) {
         } else  {
-            testResult[0] = "Test " + testName + " failed";
             takeScreenShot(testName, driver);
         }
     }
@@ -127,15 +119,12 @@ public class LoginPageTest {
         String wrongLogin = "wrongLogin";
         loginPage.login(wrongLogin, correctPassword);
 
-        wait.until(ExpectedConditions.textToBe(wrongDataMessage, "Некорректное имя пользователя или пароль."));
+        wait.until(ExpectedConditions.textToBe(wrongDataMessage, wrongLoginOrPasswordMessage));
 
-        Assertions.assertEquals("Некорректное имя пользователя или пароль.",
-                driver.findElement(wrongDataMessage).getText());
+        Assertions.assertEquals(wrongLoginOrPasswordMessage, driver.findElement(wrongDataMessage).getText());
 
-        if ("Некорректное имя пользователя или пароль.".equals(driver.findElement(wrongDataMessage).getText())) {
-            testResult[0] = "Test " + testName + " passed";
+        if (wrongLoginOrPasswordMessage.equals(driver.findElement(wrongDataMessage).getText())) {
         } else  {
-            testResult[0] = "Test " + testName + " failed";
             takeScreenShot(testName, driver);
         }
     }
@@ -152,21 +141,18 @@ public class LoginPageTest {
         String incorrectEmail = "incorrectEmail";
         driver.findElement(By.name("email")).sendKeys(incorrectEmail);
 
-        By incorrectEmailMessage = By.xpath("/html/body/div[2]/div[1]/div/form/div[1]/div/div/div");
+        By incorrectEmailMessage = By.xpath("//*[text()=" +
+                "'Требуется корректный адрес электронной почты']");
         wait.until(ExpectedConditions.textToBe(incorrectEmailMessage,
-                "Требуется корректный адрес электронной почты"));
+                correctEmailRequired));
 
-        Assertions.assertEquals("Требуется корректный адрес электронной почты",
-                driver.findElement(incorrectEmailMessage).getText());
+        Assertions.assertEquals(correctEmailRequired, driver.findElement(incorrectEmailMessage).getText());
 
-        if ("Требуется корректный адрес электронной почты".equals(driver.findElement(incorrectEmailMessage).getText())) {
-            testResult[0] = "Test " + testName + " passed";
+        if (correctEmailRequired.equals(driver.findElement(incorrectEmailMessage).getText())) {
         } else  {
-            testResult[0] = "Test " + testName + " failed";
             takeScreenShot(testName, driver);
         }
     }
-
 
     @AfterEach
     public void tearDown() {
